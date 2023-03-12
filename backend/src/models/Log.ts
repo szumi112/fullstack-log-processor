@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 export interface LogDoc extends mongoose.Document {
   name: string;
   email: string;
-  log: string;
+  processedLog: string;
   createdAt?: Date;
 }
 
@@ -17,7 +17,7 @@ const logSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    log: {
+    processedLog: {
       type: String,
       required: true,
     },

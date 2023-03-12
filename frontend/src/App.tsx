@@ -1,65 +1,49 @@
 import React, { useState } from "react";
-import axios from "axios";
+import Form from "./components/form";
+import LogsList from "./components/logs-list";
 
-function LogReportForm() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [log, setLog] = useState("");
+interface Log {
+  _id: string;
+  processedLog: string;
+}
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+const App: React.FC = () => {
+  const [logs, setLogs] = useState<Log[]>([]);
+  const [page, setPage] = useState<number>(1);
+  const [perPage] = useState<number>(5);
 
-    const formData = { name, email, log };
+  const addLog = (newLog: Log) => {
+    setLogs((prevLogs) => [...prevLogs, newLog]);
+    setPage(Math.ceil((logs.length + 1) / perPage));
+  };
 
-    try {
-      const response = await axios.post(
-        "http://localhost:3000/api/submit-log-report",
-        formData
-      );
+  const handlePrevPage = () => {
+    setPage((prevPage) => prevPage - 1);
+  };
 
-      console.log("Server response:", response.data);
-    } catch (err) {
-      console.error(err);
-    }
+  const handleNextPage = () => {
+    setPage((prevPage) => {
+      const nextPage = prevPage + 1;
+      const lastPage = Math.ceil(logs.length / perPage);
+      return nextPage > lastPage ? prevPage : nextPage;
+    });
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div>
-        <label htmlFor="name">Name:</label>
-        <input
-          type="text"
-          id="name"
-          required
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-      </div>
-
-      <div>
-        <label htmlFor="email">Email:</label>
-        <input
-          type="email"
-          id="email"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-      </div>
-
-      <div>
-        <label htmlFor="log">Log:</label>
-        <textarea
-          id="log"
-          required
-          value={log}
-          onChange={(e) => setLog(e.target.value)}
-        />
-      </div>
-
-      <button type="submit">Submit</button>
-    </form>
+    <>
+      <Form addLog={addLog} />
+      <LogsList
+        logs={logs}
+        setLogs={setLogs}
+        handlePrevPage={handlePrevPage}
+        handleNextPage={handleNextPage}
+        currentPage={page}
+        perPage={perPage}
+        totalLogs={logs.length}
+        setPage={setPage}
+      />
+    </>
   );
-}
+};
 
-export default LogReportForm;
+export default App;
