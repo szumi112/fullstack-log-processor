@@ -8,22 +8,9 @@ interface Log {
 interface LogsListProps {
   logs: Log[];
   setLogs: React.Dispatch<React.SetStateAction<Log[]>>;
-  handlePrevPage: () => void;
-  handleNextPage: () => void;
-  currentPage: number;
-  perPage: number;
-  totalLogs: number;
-  setPage: React.Dispatch<React.SetStateAction<number>>;
 }
 
-const LogsList: React.FC<LogsListProps> = ({
-  logs,
-  setLogs,
-  currentPage,
-  perPage,
-  totalLogs,
-  setPage,
-}) => {
+const LogsList: React.FC<LogsListProps> = ({ logs, setLogs }) => {
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -65,24 +52,6 @@ const LogsList: React.FC<LogsListProps> = ({
     };
   }, []); // Only run this effect once on mount
 
-  const startIdx = (currentPage - 1) * perPage;
-  const endIdx = startIdx + perPage;
-
-  const logsToRender = logs.slice(startIdx, endIdx);
-
-  const handlePrevPage = () => {
-    setPage((prevPage) => prevPage - 1);
-  };
-
-  const handleNextPage = () => {
-    setPage((prevPage) => prevPage + 1);
-  };
-
-  console.log("end idx : ", endIdx);
-  console.log(logs);
-  console.log("logs length: ", logs.length);
-  console.log("start", startIdx);
-
   return (
     <div className="list">
       <h2>Live Logs</h2>
@@ -91,7 +60,7 @@ const LogsList: React.FC<LogsListProps> = ({
       ) : (
         <>
           <ul>
-            {logsToRender.map((log) => (
+            {logs.map((log) => (
               <li key={log._id}>
                 <pre>{log.processedLog}</pre>
               </li>
@@ -99,16 +68,6 @@ const LogsList: React.FC<LogsListProps> = ({
           </ul>
           {logs.length === 0 && <p>No logs found</p>}
           {error && <p>Error: {error}</p>}
-          {logs.length > perPage && (
-            <div className="listbtns">
-              <button disabled={currentPage === 1} onClick={handlePrevPage}>
-                Prev
-              </button>
-              <button disabled={endIdx >= logs.length} onClick={handleNextPage}>
-                Next
-              </button>
-            </div>
-          )}
         </>
       )}
     </div>
